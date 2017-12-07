@@ -125,7 +125,7 @@ def evaluate(tree, env = None, evaluated_env = {}):
         tree (type varies): a fully parsed expression, as the output from the
                             parse function
     """
-    env = {'parent': carlae_builtins} if env == None else env
+    env = {';parent': carlae_builtins} if env == None else env
     if type(tree) == list: #handle a complex expression
         evaluated_env[0] = env #this is the environment in which the expression was evaluated    
         #it will keep replacing this until fully recursed and that will be final environment         
@@ -146,7 +146,7 @@ def evaluate(tree, env = None, evaluated_env = {}):
             assert len(tree) == 3 #structure: 'lambda' args expression
             args, exp = tree[1:3] 
             #lambda env is map of args to vals in dictionary with 'parent' as current env, then return lambda of evaluation of expression within this new environment 
-            return lambda vals: evaluate(exp, dict(list((args[i], vals[i]) for i in range(max(len(args), len(vals)))) + [('parent', env)]))
+            return lambda vals: evaluate(exp, dict(list((args[i], vals[i]) for i in range(max(len(args), len(vals)))) + [(';parent', env)]))
 
         else: #evaluating operation (tree[0]) on args (tree[1:])
             args = list(map(lambda x: evaluate(x, env, evaluated_env), tree[1:])) #evaluate args
@@ -164,8 +164,8 @@ def evaluate(tree, env = None, evaluated_env = {}):
                 if tree in new_env: #found it
                     evaluated_env[len(evaluated_env)] = new_env #this is where we found it
                     return new_env[tree]
-                if 'parent' not in new_env: break
-                new_env = new_env['parent'] #recurse
+                if ';parent' not in new_env: break
+                new_env = new_env[';parent'] #recurse
             raise EvaluationError('variable not defined') #couldnt find it
 
 def repl():
@@ -175,7 +175,7 @@ def repl():
     
     quit on user input 'quit'
     '''    
-    env = {'parent': carlae_builtins}
+    env = {';parent': carlae_builtins}
     while True:
         inputt = input('in : ')
         if inputt.lower() == 'quit': return 
